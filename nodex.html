@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NODEX — Adaptive Network. Always Connected.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&family=Barlow+Condensed:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --c-bg: #0c0c0c;
+  --c-bg2: #111111;
+  --c-bg3: #161616;
+  --c-bg4: #1c1c1c;
+  --c-line: #242424;
+  --c-line2: #2e2e2e;
+  --c-text: #e8e8e8;
+  --c-text2: #888888;
+  --c-text3: #555555;
+  --c-white: #ffffff;
+  --c-accent: #ffffff;
+  --header-h: 64px;
+  --max-w: 1320px;
+  --font-display: 'Barlow Condensed', sans-serif;
+  --font-body: 'Barlow', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+}
+[data-theme="light"] {
+  --c-bg: #f4f4f2;
+  --c-bg2: #eeeeec;
+  --c-bg3: #e8e8e6;
+  --c-bg4: #e0e0de;
+  --c-line: #d8d8d6;
+  --c-line2: #ccccca;
+  --c-text: #141414;
+  --c-text2: #666666;
+  --c-text3: #aaaaaa;
+  --c-white: #0c0c0c;
+  --c-accent: #0c0c0c;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--font-body);
+  background: var(--c-bg);
+  color: var(--c-text);
+  overflow-x: hidden;
+  transition: background 0.4s var(--ease), color 0.4s var(--ease);
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: var(--c-white); color: var(--c-bg); }
+
+/* SCROLL PROGRESS */
+#progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0%;
+  background: var(--c-white);
+  z-index: 9999;
+  transition: width 0.1s linear;
+  opacity: 0.7;
+}
+
+/* HEADER */
+#header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  z-index: 900;
+  transition: background 0.3s var(--ease), border-color 0.3s var(--ease);
+  border-bottom: 1px solid transparent;
+}
+#header.scrolled {
+  background: rgba(12,12,12,0.92);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom-color: var(--c-line);
+}
+[data-theme="light"] #header.scrolled {
+  background: rgba(244,244,242,0.92);
+}
+.header-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 40px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.header-logo {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--c-text);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.header-logo sup { font-size: 10px; letter-spacing: 0; vertical-align: super; opacity: 0.6; }
+nav { display: flex; align-items: center; gap: 0; }
+nav a {
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-text2);
+  text-decoration: none;
+  padding: 0 14px;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+  position: relative;
+}
+nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 14px; right: 14px;
+  height: 1px;
+  background: var(--c-text);
+  transform: scaleX(0);
+  transition: transform 0.25s var(--ease);
+}
+nav a:hover { color: var(--c-text); }
+nav a:hover::after { transform: scaleX(1); }
+.header-controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.ctrl-btn {
+  background: none;
+  border: 1px solid var(--c-line2);
+  color: var(--c-text2);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.ctrl-btn:hover { border-color: var(--c-text2); color: var(--c-text); }
+.ctrl-btn.active { border-color: var(--c-text); color: var(--c-text); }
+
+/* SECTION BASE */
+.section {
+  padding: 120px 40px;
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+.section-full {
+  padding: 120px 40px;
+  background: var(--c-bg2);
+  border-top: 1px solid var(--c-line);
+  border-bottom: 1px solid var(--c-line);
+}
+.section-full .inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-text3);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 1px;
+  background: var(--c-text3);
+}
+h2.section-heading {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(36px, 4vw, 56px);
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 60px;
+  color: var(--c-text);
+}
+h2.section-heading em { font-style: normal; color: var(--c-text2); }
+
+/* REVEAL ANIMATION */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+}
+.reveal.in { opacity: 1; transform: none; }
+.reveal-d1 { transition-delay: 0.05s; }
+.reveal-d2 { transition-delay: 0.12s; }
+.reveal-d3 { transition-delay: 0.19s; }
+.reveal-d4 { transition-delay: 0.26s; }
+.reveal-d5 { transition-delay: 0.33s; }
+
+/* =========================================
+   HERO
+   ========================================= */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: calc(var(--header-h) + 60px) 40px 80px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-grid-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image:
+    linear-gradient(var(--c-white) 1px, transparent 1px),
+    linear-gradient(90deg, var(--c-white) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+[data-theme="light"] .hero-grid-bg { opacity: 0.07; }
+.hero-noise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.4;
+}
+.hero-status {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--c-text3);
+  text-transform: uppercase;
+  margin-bottom: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: fadeInDown 1s var(--ease-out) 0.2s both;
+}
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--c-text3);
+  animation: pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* HERO LOGO TEXT with dispersion */
+.hero-logo-wrap {
+  position: relative;
+  margin-bottom: 32px;
+  animation: fadeInUp 1s var(--ease-out) 0.4s both;
+}
+.hero-logo {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(80px, 14vw, 180px);
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--c-text);
+  line-height: 0.9;
+  position: relative;
+  display: inline-block;
+  user-select: none;
+}
+.hero-logo sup {
+  font-size: clamp(16px, 2.5vw, 32px);
+  letter-spacing: 0;
+  vertical-align: super;
+  opacity: 0.4;
+  font-weight: 700;
+}
+
+/* Dispersion / spray effect via pseudo layers */
+.hero-logo::before,
+.hero-logo::after {
+  content: 'NODEX';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: inherit;
+  letter-spacing: inherit;
+  text-transform: uppercase;
+  color: var(--c-text);
+  line-height: 0.9;
+  pointer-events: none;
+}
+.hero-logo::before {
+  filter: blur(12px);
+  opacity: 0;
+  animation: disperse 5s ease-in-out 1.5s infinite;
+  mask-image: linear-gradient(90deg, black 0%, transparent 30%, transparent 70%, black 100%);
+  -webkit-mask-image: linear-gradient(90deg, black 0%, transparent 30%, transparent 70%, black 100%);
+}
+.hero-logo::after {
+  filter: blur(20px);
+  opacity: 0;
+  animation: disperse 5s ease-in-out 2.5s infinite;
+  mask-image: linear-gradient(90deg, black 0%, transparent 25%, transparent 75%, black 100%);
+  -webkit-mask-image: linear-gradient(90deg, black 0%, transparent 25%, transparent 75%, black 100%);
+}
+@keyframes disperse {
+  0%, 100% { opacity: 0; }
+  15%, 25% { opacity: 0.25; }
+  20% { opacity: 0.35; }
+}
+
+.hero-tagline {
+  font-family: var(--font-display);
+  font-size: clamp(14px, 2vw, 18px);
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-text2);
+  margin-bottom: 20px;
+  animation: fadeInUp 1s var(--ease-out) 0.6s both;
+}
+.hero-sub {
+  font-size: 15px;
+  color: var(--c-text3);
+  max-width: 520px;
+  line-height: 1.7;
+  margin-bottom: 48px;
+  animation: fadeInUp 1s var(--ease-out) 0.75s both;
+}
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  animation: fadeInUp 1s var(--ease-out) 0.9s both;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.btn-primary {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: var(--c-white);
+  color: var(--c-bg);
+  border: 1px solid var(--c-white);
+  padding: 16px 36px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.btn-primary:hover {
+  background: transparent;
+  color: var(--c-white);
+}
+.btn-ghost {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--c-text2);
+  border: 1px solid var(--c-line2);
+  padding: 16px 36px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s;
+}
+.btn-ghost:hover { border-color: var(--c-text2); color: var(--c-text); }
+.hero-scroll-hint {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: fadeInUp 1s var(--ease-out) 1.5s both;
+}
+.hero-scroll-hint span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--c-text3);
+  text-transform: uppercase;
+}
+.scroll-arrow {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--c-text3), transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse {
+  0%, 100% { transform: scaleY(1); opacity: 1; }
+  50% { transform: scaleY(0.7); opacity: 0.4; }
+}
+
+/* =========================================
+   TRUST BLOCK
+   ========================================= */
+.trust-bar {
+  background: var(--c-bg2);
+  border-top: 1px solid var(--c-line);
+  border-bottom: 1px solid var(--c-line);
+  padding: 0 40px;
+}
+.trust-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+.trust-item {
+  padding: 40px 48px;
+  border-right: 1px solid var(--c-line);
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+.trust-item:last-child { border-right: none; }
+.trust-icon { flex-shrink: 0; opacity: 0.4; margin-top: 3px; }
+.trust-item h4 {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  color: var(--c-text);
+}
+.trust-item p { font-size: 13px; color: var(--c-text2); line-height: 1.6; }
+
+/* SVG network grid decoration */
+.network-svg-wrap {
+  margin-top: 60px;
+  opacity: 0.25;
+  overflow: hidden;
+}
+
+/* =========================================
+   PERFORMANCE / STATS
+   ========================================= */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border: 1px solid var(--c-line);
+  margin-bottom: 1px;
+}
+.stats-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border: 1px solid var(--c-line);
+  border-top: none;
+}
+.stat-cell {
+  padding: 40px 32px;
+  border-right: 1px solid var(--c-line);
+  position: relative;
+}
+.stat-cell:last-child { border-right: none; }
+.stat-num {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(28px, 3vw, 44px);
+  letter-spacing: -0.02em;
+  color: var(--c-text);
+  line-height: 1;
+  margin-bottom: 10px;
+  transition: none;
+}
+.stat-desc {
+  font-size: 11.5px;
+  color: var(--c-text2);
+  line-height: 1.5;
+  font-weight: 500;
+}
+.stat-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--c-text3);
+  letter-spacing: 0.1em;
+  margin-top: 8px;
+}
+
+/* =========================================
+   HOW IT WORKS / NODEX LINK
+   ========================================= */
+.flow-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border: 1px solid var(--c-line);
+  margin-top: 60px;
+}
+.flow-step {
+  padding: 48px 36px;
+  border-right: 1px solid var(--c-line);
+  position: relative;
+}
+.flow-step:last-child { border-right: none; }
+.flow-step-n {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--c-text3);
+  letter-spacing: 0.15em;
+  margin-bottom: 20px;
+}
+.flow-step h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.flow-step p { font-size: 13.5px; color: var(--c-text2); line-height: 1.7; }
+.flow-arrow-connector {
+  position: absolute;
+  right: -13px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  background: var(--c-bg);
+  padding: 4px 0;
+}
+[data-theme="light"] .flow-arrow-connector { background: var(--c-bg2); }
+
+/* LINK diagram */
+.link-diagram {
+  margin: 60px 0;
+  padding: 60px;
+  background: var(--c-bg2);
+  border: 1px solid var(--c-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =========================================
+   FEATURES
+   ========================================= */
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--c-line);
+  border: 1px solid var(--c-line);
+  margin-top: 60px;
+}
+.feature-card {
+  background: var(--c-bg);
+  padding: 56px 48px;
+  transition: background 0.25s;
+}
+[data-theme="light"] .feature-card { background: var(--c-bg2); }
+.feature-card:hover { background: var(--c-bg2); }
+[data-theme="light"] .feature-card:hover { background: var(--c-bg3); }
+.feature-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--c-text3);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.feature-card h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  color: var(--c-text);
+}
+.feature-card p { font-size: 14px; color: var(--c-text2); line-height: 1.8; max-width: 400px; }
+
+/* =========================================
+   DEVICE
+   ========================================= */
+.device-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  margin-top: 60px;
+}
+.device-svg-col { display: flex; justify-content: center; }
+.device-info h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 22px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 16px;
+}
+.device-info p { font-size: 14px; color: var(--c-text2); line-height: 1.8; margin-bottom: 32px; }
+.spec-list { list-style: none; }
+.spec-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--c-line);
+  font-size: 13px;
+}
+.spec-list li:last-child { border-bottom: none; }
+.spec-key { color: var(--c-text2); font-weight: 500; }
+.spec-val { font-family: var(--font-mono); color: var(--c-text); font-size: 12px; letter-spacing: 0.05em; }
+
+/* =========================================
+   INFRASTRUCTURE
+   ========================================= */
+.infra-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--c-line);
+  border: 1px solid var(--c-line);
+  margin-top: 60px;
+}
+.infra-card {
+  background: var(--c-bg);
+  padding: 48px 40px;
+}
+[data-theme="light"] .infra-card { background: var(--c-bg2); }
+.infra-card-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--c-text3);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.infra-card h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 17px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 16px;
+}
+.infra-card p { font-size: 13.5px; color: var(--c-text2); line-height: 1.8; }
+
+/* =========================================
+   SECURITY
+   ========================================= */
+.security-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+  margin-top: 60px;
+}
+.security-points { list-style: none; }
+.security-points li {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--c-line);
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+.sec-icon { flex-shrink: 0; margin-top: 2px; }
+.sec-label {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+.sec-desc { font-size: 13px; color: var(--c-text2); line-height: 1.7; }
+
+/* =========================================
+   ROADMAP
+   ========================================= */
+.roadmap-list {
+  margin-top: 60px;
+  position: relative;
+}
+.roadmap-list::before {
+  content: '';
+  position: absolute;
+  left: 52px;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: var(--c-line2);
+}
+.rm-item {
+  display: grid;
+  grid-template-columns: 104px 1fr;
+  gap: 0;
+  margin-bottom: 2px;
+  position: relative;
+}
+.rm-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 32px;
+  padding-right: 32px;
+  position: relative;
+}
+.rm-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid var(--c-text2);
+  background: var(--c-bg);
+  flex-shrink: 0;
+  z-index: 2;
+  transition: background 0.2s, border-color 0.2s;
+}
+.rm-item:hover .rm-dot { background: var(--c-text); border-color: var(--c-text); }
+.rm-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--c-text3);
+  letter-spacing: 0.15em;
+  margin-top: 10px;
+  text-align: center;
+}
+.rm-right {
+  padding: 28px 40px;
+  border: 1px solid var(--c-line);
+  background: var(--c-bg2);
+  transition: background 0.2s, border-color 0.2s;
+  margin-bottom: 2px;
+}
+.rm-item:hover .rm-right { border-color: var(--c-line2); background: var(--c-bg3); }
+.rm-header { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 10px; }
+.rm-phase-label {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.rm-duration {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--c-text3);
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+.rm-goal { font-size: 13px; color: var(--c-text2); line-height: 1.6; }
+
+/* =========================================
+   FAQ
+   ========================================= */
+.faq-list { margin-top: 60px; }
+.faq-item {
+  border-bottom: 1px solid var(--c-line);
+  overflow: hidden;
+}
+.faq-q {
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--c-text);
+  text-align: left;
+  padding: 28px 0;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  transition: color 0.2s;
+}
+.faq-q:hover { color: var(--c-text2); }
+.faq-q-icon {
+  width: 20px; height: 20px;
+  flex-shrink: 0;
+  position: relative;
+  transition: transform 0.3s var(--ease);
+}
+.faq-q-icon::before, .faq-q-icon::after {
+  content: '';
+  position: absolute;
+  background: currentColor;
+}
+.faq-q-icon::before { top: 50%; left: 0; right: 0; height: 1px; margin-top: -0.5px; }
+.faq-q-icon::after { left: 50%; top: 0; bottom: 0; width: 1px; margin-left: -0.5px; transition: transform 0.3s var(--ease); }
+.faq-item.open .faq-q-icon::after { transform: rotate(90deg); }
+.faq-a {
+  font-size: 14px;
+  color: var(--c-text2);
+  line-height: 1.8;
+  max-width: 760px;
+  padding-bottom: 28px;
+  display: none;
+}
+.faq-item.open .faq-a { display: block; }
+
+/* =========================================
+   CTA FINAL
+   ========================================= */
+.cta-section {
+  padding: 120px 40px;
+  text-align: center;
+  background: var(--c-bg2);
+  border-top: 1px solid var(--c-line);
+}
+.cta-section h2 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(40px, 6vw, 80px);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.cta-section p { color: var(--c-text2); font-size: 15px; max-width: 480px; margin: 0 auto 48px; line-height: 1.7; }
+.signup-form {
+  display: flex;
+  gap: 0;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.signup-form input {
+  flex: 1;
+  background: var(--c-bg3);
+  border: 1px solid var(--c-line2);
+  border-right: none;
+  color: var(--c-text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 16px 20px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.signup-form input::placeholder { color: var(--c-text3); }
+.signup-form input:focus { border-color: var(--c-text2); }
+.signup-form button {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: var(--c-white);
+  color: var(--c-bg);
+  border: 1px solid var(--c-white);
+  padding: 16px 28px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+}
+.signup-form button:hover { background: transparent; color: var(--c-white); }
+
+/* =========================================
+   FOOTER
+   ========================================= */
+footer {
+  background: var(--c-bg);
+  border-top: 1px solid var(--c-line);
+  padding: 60px 40px 40px;
+}
+.footer-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+.footer-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 60px;
+  margin-bottom: 60px;
+  padding-bottom: 60px;
+  border-bottom: 1px solid var(--c-line);
+}
+.footer-brand h3 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 24px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 12px;
+}
+.footer-brand h3 sup { font-size: 10px; opacity: 0.5; }
+.footer-brand p { font-size: 13px; color: var(--c-text2); line-height: 1.7; max-width: 240px; }
+.footer-col h4 {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-text3);
+  margin-bottom: 20px;
+}
+.footer-col ul { list-style: none; }
+.footer-col ul li { margin-bottom: 10px; }
+.footer-col ul li a {
+  font-size: 13px;
+  color: var(--c-text2);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-col ul li a:hover { color: var(--c-text); }
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.footer-legal { display: flex; gap: 24px; flex-wrap: wrap; }
+.footer-legal a { font-size: 12px; color: var(--c-text3); text-decoration: none; transition: color 0.2s; }
+.footer-legal a:hover { color: var(--c-text2); }
+.footer-copy { font-size: 12px; color: var(--c-text3); font-family: var(--font-mono); }
+
+/* BACK TO TOP */
+#btt {
+  position: fixed;
+  bottom: 32px; right: 32px;
+  width: 44px; height: 44px;
+  background: var(--c-bg2);
+  border: 1px solid var(--c-line2);
+  color: var(--c-text2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s var(--ease);
+  z-index: 800;
+}
+#btt.visible { opacity: 1; pointer-events: auto; }
+#btt:hover { border-color: var(--c-text2); color: var(--c-text); }
+
+/* MICROCOPY TERMINAL */
+.terminal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--c-bg3);
+  border: 1px solid var(--c-line2);
+  padding: 8px 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--c-text2);
+  margin-bottom: 40px;
+}
+.terminal-badge::before {
+  content: '>';
+  color: var(--c-text3);
+}
+.blink {
+  display: inline-block;
+  width: 7px;
+  height: 13px;
+  background: var(--c-text2);
+  animation: blink 1.2s step-end infinite;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .stats-grid-2 { grid-template-columns: repeat(3, 1fr); }
+  .flow-steps { grid-template-columns: repeat(2, 1fr); }
+  .footer-top { grid-template-columns: 1fr 1fr; gap: 40px; }
+}
+@media (max-width: 900px) {
+  nav { display: none; }
+  .trust-inner { grid-template-columns: 1fr; }
+  .trust-item { border-right: none; border-bottom: 1px solid var(--c-line); }
+  .trust-item:last-child { border-bottom: none; }
+  .features-grid { grid-template-columns: 1fr; }
+  .device-wrap { grid-template-columns: 1fr; }
+  .infra-grid { grid-template-columns: 1fr; }
+  .security-split { grid-template-columns: 1fr; }
+  .footer-top { grid-template-columns: 1fr; }
+  .header-inner { padding: 0 20px; }
+  .section, .section-full { padding: 80px 20px; }
+}
+@media (max-width: 640px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .stats-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .flow-steps { grid-template-columns: 1fr; }
+  .signup-form { flex-direction: column; }
+  .signup-form input { border-right: 1px solid var(--c-line2); border-bottom: none; }
+  .hero-actions { flex-direction: column; width: 100%; }
+  .btn-primary, .btn-ghost { width: 100%; justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<!-- HEADER -->
+<header id="header">
+  <div class="header-inner">
+    <a href="#" class="header-logo">NODEX<sup>®</sup></a>
+    <nav id="main-nav">
+      <a href="#features" data-key="nav_features">Features</a>
+      <a href="#technology" data-key="nav_technology">Technology</a>
+      <a href="#performance" data-key="nav_performance">Performance</a>
+      <a href="#roadmap" data-key="nav_roadmap">Roadmap</a>
+      <a href="#infrastructure" data-key="nav_infrastructure">Infrastructure</a>
+      <a href="#security" data-key="nav_security">Security</a>
+      <a href="#faq" data-key="nav_faq">FAQ</a>
+      <a href="#contact" data-key="nav_contact">Contact</a>
+    </nav>
+    <div class="header-controls">
+      <button class="ctrl-btn" id="lang-toggle">EN</button>
+      <button class="ctrl-btn" id="theme-toggle">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="3" stroke="currentColor" stroke-width="1.2"/><line x1="7" y1="0" x2="7" y2="2" stroke="currentColor" stroke-width="1.2"/><line x1="7" y1="12" x2="7" y2="14" stroke="currentColor" stroke-width="1.2"/><line x1="0" y1="7" x2="2" y2="7" stroke="currentColor" stroke-width="1.2"/><line x1="12" y1="7" x2="14" y2="7" stroke="currentColor" stroke-width="1.2"/><line x1="2.05" y1="2.05" x2="3.46" y2="3.46" stroke="currentColor" stroke-width="1.2"/><line x1="10.54" y1="10.54" x2="11.95" y2="11.95" stroke="currentColor" stroke-width="1.2"/><line x1="11.95" y1="2.05" x2="10.54" y2="3.46" stroke="currentColor" stroke-width="1.2"/><line x1="3.46" y1="10.54" x2="2.05" y2="11.95" stroke="currentColor" stroke-width="1.2"/></svg>
+        <span id="theme-label">Light</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-noise"></div>
+
+  <div class="hero-status">
+    <span class="status-dot"></span>
+    <span data-key="hero_status">NODEX LINK Active</span>
+  </div>
+
+  <div class="hero-logo-wrap">
+    <div class="hero-logo">NODEX<sup>®</sup></div>
+  </div>
+
+  <p class="hero-tagline" data-key="hero_tagline">Adaptive Network. Always Connected.</p>
+  <p class="hero-sub" data-key="hero_sub">A personal network node that ensures stable connectivity in restricted, unstable, or filtered environments — without configuration.</p>
+
+  <div class="hero-actions">
+    <a href="#contact" class="btn-primary" data-key="hero_cta">Get Early Access</a>
+    <a href="#technology" class="btn-ghost" data-key="hero_learn">How It Works</a>
+  </div>
+
+  <div class="hero-scroll-hint">
+    <span data-key="hero_scroll">Scroll</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar reveal">
+  <div class="trust-inner">
+    <div class="trust-item">
+      <div class="trust-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/></svg>
+      </div>
+      <div>
+        <h4 data-key="trust1_h">Unstable Environment Ready</h4>
+        <p data-key="trust1_p">Designed specifically for restricted, throttled, and filtered network conditions.</p>
+      </div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div>
+        <h4 data-key="trust2_h">Real-World Tested</h4>
+        <p data-key="trust2_p">Validated across mobile networks, public Wi-Fi, and heavily filtered infrastructure.</p>
+      </div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      </div>
+      <div>
+        <h4 data-key="trust3_h">Modern Routing Core</h4>
+        <p data-key="trust3_p">Built on current-generation protocol stack with adaptive fallback logic at every layer.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PERFORMANCE -->
+<div class="section-full" id="performance">
+  <div class="inner">
+    <div class="section-label" data-key="perf_label">System Metrics</div>
+    <h2 class="section-heading reveal" data-key="perf_h">Performance <em>Specifications</em></h2>
+
+    <div class="stats-grid reveal reveal-d1">
+      <div class="stat-cell">
+        <div class="stat-num" data-target="136" data-suffix="ms" data-prefix="">136ms</div>
+        <div class="stat-desc" data-key="stat1_d">Server response time</div>
+        <div class="stat-meta" data-key="stat1_m">avg. measured</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" data-raw="&lt; 2s">&lt; 2s</div>
+        <div class="stat-desc" data-key="stat2_d">Connection establishment</div>
+        <div class="stat-meta" data-key="stat2_m">from power-on</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" data-target="98" data-suffix="%" data-prefix="~">98%</div>
+        <div class="stat-desc" data-key="stat3_d">Uptime in adaptive mode</div>
+        <div class="stat-meta" data-key="stat3_m">*network dependent</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" data-target="300" data-suffix=" Mbps" data-prefix="">300 Mbps</div>
+        <div class="stat-desc" data-key="stat4_d">Peak node throughput</div>
+        <div class="stat-meta" data-key="stat4_m">theoretical max</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" data-raw="&lt; 0.5s">&lt; 0.5s</div>
+        <div class="stat-desc" data-key="stat5_d">Protocol switch latency</div>
+        <div class="stat-meta" data-key="stat5_m">measured transition</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" data-target="12" data-suffix="" data-prefix="">12</div>
+        <div class="stat-desc" data-key="stat6_d">Concurrent devices</div>
+        <div class="stat-meta" data-key="stat6_m">per node</div>
+      </div>
+    </div>
+
+    <div class="stats-grid-2 reveal reveal-d2">
+      <div class="stat-cell">
+        <div class="stat-num" data-target="50" data-suffix="+" data-prefix="">50+</div>
+        <div class="stat-desc" data-key="stat7_d">Protocol switches / hour</div>
+        <div class="stat-meta" data-key="stat7_m">without drop</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" data-target="4" data-suffix="" data-prefix="">4</div>
+        <div class="stat-desc" data-key="stat8_d">Active protocols</div>
+        <div class="stat-meta" data-key="stat8_m">simultaneous routing</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" data-raw="2.4 / 5 GHz">2.4 / 5 GHz</div>
+        <div class="stat-desc" data-key="stat9_d">Dual-band Wi-Fi</div>
+        <div class="stat-meta" data-key="stat9_m">802.11ac/n</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" data-target="20" data-suffix="m" data-prefix="">20m</div>
+        <div class="stat-desc" data-key="stat10_d">Coverage radius</div>
+        <div class="stat-meta" data-key="stat10_m">open environment</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" data-raw="6–12h">6–12h</div>
+        <div class="stat-desc" data-key="stat11_d">Battery autonomy</div>
+        <div class="stat-meta" data-key="stat11_m">active load</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px; padding: 16px 0; border-top: 1px solid var(--c-line);">
+      <p style="font-size: 12px; color: var(--c-text3); font-family: var(--font-mono);" data-key="stat_disclaimer">* All metrics depend on network conditions, location, and configuration state. Values represent measured or theoretical bounds.</p>
+    </div>
+  </div>
+</div>
+
+<!-- TECHNOLOGY / NODEX LINK -->
+<section id="technology" class="section">
+  <div class="section-label" data-key="tech_label">Core Technology</div>
+  <h2 class="section-heading reveal" data-key="tech_h">NODEX <em>LINK</em></h2>
+
+  <p class="reveal reveal-d1" style="font-size: 15px; color: var(--c-text2); max-width: 620px; line-height: 1.8; margin-bottom: 0;" data-key="tech_intro">NODEX LINK is the adaptive routing engine embedded in every device. It continuously monitors network conditions, identifies restrictions, and reroutes traffic without user interaction.</p>
+
+  <div class="flow-steps reveal reveal-d2">
+    <div class="flow-step">
+      <div class="flow-step-n">01 /</div>
+      <h3 data-key="flow1_h">Detect</h3>
+      <p data-key="flow1_p">Samples network conditions every 200ms. Identifies latency spikes, packet loss, DNS interference, deep packet inspection, and protocol filtering.</p>
+      <div class="flow-arrow-connector">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--c-line2)" stroke-width="1"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-step-n">02 /</div>
+      <h3 data-key="flow2_h">Analyze</h3>
+      <p data-key="flow2_p">Scores available protocols and routing paths. Ranks options by stability, throughput, and evasion effectiveness. Selects the optimal fallback chain.</p>
+      <div class="flow-arrow-connector">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--c-line2)" stroke-width="1"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-step-n">03 /</div>
+      <h3 data-key="flow3_h">Adapt</h3>
+      <p data-key="flow3_p">Switches active protocol within 500ms. Re-wraps traffic in the required transport layer. Updates routing tables without breaking active sessions.</p>
+      <div class="flow-arrow-connector">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--c-line2)" stroke-width="1"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-step-n">04 /</div>
+      <h3 data-key="flow4_h">Route</h3>
+      <p data-key="flow4_p">Maintains stable connection state across the private Wi-Fi network. All connected devices benefit simultaneously. No user interaction at any step.</p>
+    </div>
+  </div>
+
+  <!-- SVG Link Diagram -->
+  <div class="link-diagram reveal reveal-d3">
+    <svg width="100%" height="120" viewBox="0 0 900 120" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="var(--c-line2)"/>
+        </marker>
+      </defs>
+      <!-- Device -->
+      <rect x="20" y="35" width="100" height="50" rx="2" stroke="var(--c-line2)" stroke-width="1" fill="none"/>
+      <text x="70" y="57" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="11" font-weight="700" letter-spacing="1" fill="var(--c-text3)">NODEX</text>
+      <text x="70" y="72" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--c-text3)">device</text>
+      <!-- arrow -->
+      <line x1="122" y1="60" x2="175" y2="60" stroke="var(--c-line2)" stroke-width="1" marker-end="url(#arr)"/>
+      <!-- LINK Engine -->
+      <rect x="178" y="20" width="130" height="80" rx="2" stroke="var(--c-text2)" stroke-width="1" fill="var(--c-bg3)"/>
+      <text x="243" y="53" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="12" font-weight="800" letter-spacing="1.5" fill="var(--c-text)">NODEX</text>
+      <text x="243" y="68" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="10" font-weight="600" letter-spacing="2" fill="var(--c-text2)">LINK</text>
+      <text x="243" y="83" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8" fill="var(--c-text3)">engine</text>
+      <!-- arrow -->
+      <line x1="310" y1="60" x2="363" y2="60" stroke="var(--c-line2)" stroke-width="1" marker-end="url(#arr)"/>
+      <!-- Protocol selector -->
+      <rect x="366" y="10" width="120" height="100" rx="2" stroke="var(--c-line2)" stroke-width="1" fill="none"/>
+      <text x="426" y="35" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--c-text3)">PROTO A</text>
+      <line x1="386" y1="42" x2="466" y2="42" stroke="var(--c-line)" stroke-width="1"/>
+      <text x="426" y="57" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--c-text2)">PROTO B</text>
+      <line x1="386" y1="64" x2="466" y2="64" stroke="var(--c-line)" stroke-width="1"/>
+      <text x="426" y="79" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--c-text3)">PROTO C</text>
+      <line x1="386" y1="86" x2="466" y2="86" stroke="var(--c-line)" stroke-width="1"/>
+      <text x="426" y="100" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--c-text3)">PROTO D</text>
+      <!-- arrow -->
+      <line x1="488" y1="60" x2="541" y2="60" stroke="var(--c-line2)" stroke-width="1" marker-end="url(#arr)"/>
+      <!-- Adaptive router -->
+      <rect x="544" y="30" width="120" height="60" rx="2" stroke="var(--c-line2)" stroke-width="1" fill="none"/>
+      <text x="604" y="58" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="11" font-weight="700" letter-spacing="1" fill="var(--c-text2)">ADAPTIVE</text>
+      <text x="604" y="73" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--c-text3)">router</text>
+      <!-- arrow -->
+      <line x1="666" y1="60" x2="719" y2="60" stroke="var(--c-line2)" stroke-width="1" marker-end="url(#arr)"/>
+      <!-- Network -->
+      <rect x="722" y="35" width="100" height="50" rx="2" stroke="var(--c-line2)" stroke-width="1" fill="none"/>
+      <text x="772" y="57" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="11" font-weight="700" letter-spacing="1" fill="var(--c-text3)">NETWORK</text>
+      <text x="772" y="72" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--c-text3)">output</text>
+      <!-- status indicator -->
+      <circle cx="852" cy="35" r="4" fill="none" stroke="var(--c-text3)" stroke-width="1"/>
+      <text x="860" y="55" font-family="'JetBrains Mono',monospace" font-size="8" fill="var(--c-text3)">LINK</text>
+      <text x="860" y="67" font-family="'JetBrains Mono',monospace" font-size="8" fill="var(--c-text3)">OK</text>
+    </svg>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<div class="section-full" id="features">
+  <div class="inner">
+    <div class="section-label" data-key="feat_label">Capabilities</div>
+    <h2 class="section-heading reveal" data-key="feat_h">Core <em>Features</em></h2>
+
+    <div class="features-grid">
+      <div class="feature-card reveal reveal-d1">
+        <div class="feature-tag" data-key="f1_tag">01 / Feature</div>
+        <h3 data-key="f1_h">Adaptive Routing</h3>
+        <p data-key="f1_p">Real-time analysis of network conditions drives automatic protocol selection. NODEX LINK scores and ranks available paths every 200ms, switching seamlessly before degradation affects user experience.</p>
+      </div>
+      <div class="feature-card reveal reveal-d2">
+        <div class="feature-tag" data-key="f2_tag">02 / Feature</div>
+        <h3 data-key="f2_h">Multi-Protocol Engine</h3>
+        <p data-key="f2_p">Four concurrent routing protocols maintained in parallel. Fallback chains are pre-computed before the primary route fails. 50+ switches per hour without session interruption is standard operating mode.</p>
+      </div>
+      <div class="feature-card reveal reveal-d3">
+        <div class="feature-tag" data-key="f3_tag">03 / Feature</div>
+        <h3 data-key="f3_h">Zero Configuration</h3>
+        <p data-key="f3_p">No setup screens. No credentials. No technical knowledge required. Turn on, connect to the NODEX Wi-Fi network, and the system handles the rest. Configuration happens at the routing layer, invisibly.</p>
+      </div>
+      <div class="feature-card reveal reveal-d4">
+        <div class="feature-tag" data-key="f4_tag">04 / Feature</div>
+        <h3 data-key="f4_h">Portable Node</h3>
+        <p data-key="f4_p">Pocket-sized industrial unit. Dual external antennas. Dual-band 802.11ac/n. 6–12h battery. 20m stable coverage radius. Up to 12 concurrent connected devices. Designed for field conditions, not controlled environments.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DEVICE -->
+<section class="section">
+  <div class="section-label" data-key="dev_label">Hardware</div>
+  <h2 class="section-heading reveal" data-key="dev_h">The <em>Device</em></h2>
+
+  <div class="device-wrap">
+    <div class="device-svg-col reveal reveal-d1">
+      <!-- SVG device mock -->
+      <svg width="260" height="420" viewBox="0 0 260 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Body -->
+        <rect x="40" y="60" width="180" height="300" rx="12" stroke="var(--c-line2)" stroke-width="1.5" fill="var(--c-bg3)"/>
+        <!-- Top panel -->
+        <rect x="40" y="60" width="180" height="50" rx="12" fill="var(--c-bg4)"/>
+        <rect x="40" y="90" width="180" height="20" fill="var(--c-bg4)"/>
+        <!-- Left antenna -->
+        <line x1="80" y1="60" x2="80" y2="20" stroke="var(--c-text3)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="72" y1="20" x2="88" y2="20" stroke="var(--c-text3)" stroke-width="1.5"/>
+        <!-- Right antenna -->
+        <line x1="180" y1="60" x2="180" y2="20" stroke="var(--c-text3)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="172" y1="20" x2="188" y2="20" stroke="var(--c-text3)" stroke-width="1.5"/>
+        <!-- Status LEDs -->
+        <circle cx="94" cy="76" r="4" fill="none" stroke="var(--c-text3)" stroke-width="1"/>
+        <circle cx="110" cy="76" r="4" fill="none" stroke="var(--c-text3)" stroke-width="1"/>
+        <circle cx="126" cy="76" r="4" fill="var(--c-text2)" stroke="none"/>
+        <!-- Screen/display area -->
+        <rect x="60" y="126" width="140" height="80" rx="4" fill="var(--c-bg)" stroke="var(--c-line)" stroke-width="1"/>
+        <text x="130" y="155" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8" fill="var(--c-text3)" letter-spacing="1">NODEX LINK</text>
+        <text x="130" y="172" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="var(--c-text2)">ACTIVE</text>
+        <text x="130" y="188" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="var(--c-text3)">PROTO: 02 / 04</text>
+        <!-- Port row -->
+        <rect x="90" y="234" width="80" height="14" rx="2" fill="var(--c-bg)" stroke="var(--c-line)" stroke-width="1"/>
+        <text x="130" y="245" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="var(--c-text3)">USB-C</text>
+        <!-- Brand text -->
+        <text x="130" y="290" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="18" font-weight="900" letter-spacing="3" fill="var(--c-text2)">NODEX</text>
+        <!-- Bottom indicators -->
+        <rect x="60" y="316" width="140" height="28" rx="2" fill="var(--c-bg4)" stroke="var(--c-line)" stroke-width="1"/>
+        <text x="130" y="333" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8" fill="var(--c-text3)" letter-spacing="0.5">N-1 / REV.A</text>
+        <!-- Side button -->
+        <rect x="37" y="170" width="4" height="30" rx="2" fill="var(--c-bg4)"/>
+        <rect x="37" y="210" width="4" height="20" rx="2" fill="var(--c-bg4)"/>
+      </svg>
+    </div>
+    <div class="device-info reveal reveal-d2">
+      <div class="terminal-badge" data-key="dev_badge">Hardware — Node N-1</div>
+      <h3 data-key="dev_h2">Engineered for Field Conditions</h3>
+      <p data-key="dev_p">The NODEX hardware unit is not a consumer gadget. It is designed around the use case: deployed quickly, operated without interaction, maintained without technical staff. Industrial-grade components, ruggedized enclosure, extended thermal range.</p>
+      <ul class="spec-list">
+        <li><span class="spec-key" data-key="spec1_k">Form factor</span><span class="spec-val">Pocket / powerbank</span></li>
+        <li><span class="spec-key" data-key="spec2_k">Antennas</span><span class="spec-val">2x external, dual-band</span></li>
+        <li><span class="spec-key" data-key="spec3_k">Wi-Fi</span><span class="spec-val">802.11 a/b/g/n/ac</span></li>
+        <li><span class="spec-key" data-key="spec4_k">Frequency bands</span><span class="spec-val">2.4 GHz + 5 GHz</span></li>
+        <li><span class="spec-key" data-key="spec5_k">Coverage</span><span class="spec-val">up to 20m radius</span></li>
+        <li><span class="spec-key" data-key="spec6_k">Devices</span><span class="spec-val">up to 12 concurrent</span></li>
+        <li><span class="spec-key" data-key="spec7_k">Battery</span><span class="spec-val">6–12 hours active</span></li>
+        <li><span class="spec-key" data-key="spec8_k">Connectivity</span><span class="spec-val">USB-C charging + data</span></li>
+        <li><span class="spec-key" data-key="spec9_k">Price</span><span class="spec-val">€80 – €120 (device)</span></li>
+        <li><span class="spec-key" data-key="spec10_k">Subscription</span><span class="spec-val">€5 – €10 / month</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- INFRASTRUCTURE -->
+<div class="section-full" id="infrastructure">
+  <div class="inner">
+    <div class="section-label" data-key="infra_label">System Architecture</div>
+    <h2 class="section-heading reveal" data-key="infra_h">Infrastructure <em>Design</em></h2>
+    <p class="reveal reveal-d1" style="font-size: 15px; color: var(--c-text2); max-width: 640px; line-height: 1.8; margin-bottom: 0;" data-key="infra_intro">NODEX is not a single-point proxy. It operates as a layered adaptive system where each component functions independently and can maintain connection state during failure of adjacent layers.</p>
+
+    <div class="infra-grid reveal reveal-d2">
+      <div class="infra-card">
+        <div class="infra-card-label" data-key="infra1_tag">Layer 01</div>
+        <h3 data-key="infra1_h">Distributed Routing</h3>
+        <p data-key="infra1_p">Traffic does not pass through a central server. NODEX routes through dynamically selected endpoints based on current network topology. There is no single point of failure. Endpoint selection is recalculated continuously and independent of upstream availability.</p>
+      </div>
+      <div class="infra-card">
+        <div class="infra-card-label" data-key="infra2_tag">Layer 02</div>
+        <h3 data-key="infra2_h">Dynamic Endpoints</h3>
+        <p data-key="infra2_p">Available relay infrastructure is evaluated in real time. NODEX LINK maintains a scored pool of endpoints, aging out degraded entries and promoting newly discovered ones. Endpoint rotation is continuous — not triggered only by failure.</p>
+      </div>
+      <div class="infra-card">
+        <div class="infra-card-label" data-key="infra3_tag">Layer 03</div>
+        <h3 data-key="infra3_h">Protocol Switching</h3>
+        <p data-key="infra3_p">Protocol selection operates independently from routing. A given route may be re-wrapped in a different transport protocol without changing the underlying path. This two-axis adaptability covers more failure scenarios than single-strategy systems.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECURITY -->
+<section id="security" class="section">
+  <div class="section-label" data-key="sec_label">Privacy & Protection</div>
+  <h2 class="section-heading reveal" data-key="sec_h">Security <em>Model</em></h2>
+
+  <div class="security-split">
+    <div class="reveal reveal-d1">
+      <p style="font-size: 15px; color: var(--c-text2); line-height: 1.8; margin-bottom: 32px;" data-key="sec_intro">NODEX does not claim to be an anonymity tool. It claims to be a resilient transport layer. Security properties follow from that architecture, not from marketing intent.</p>
+      <ul class="security-points">
+        <li>
+          <div class="sec-icon">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="var(--c-text3)" stroke-width="1.2"><rect x="3" y="7" width="12" height="9" rx="1"/><path d="M6 7V5a3 3 0 016 0v2"/></svg>
+          </div>
+          <div>
+            <div class="sec-label" data-key="sec1_h">Encrypted Transport</div>
+            <div class="sec-desc" data-key="sec1_p">All traffic passing through the NODEX routing layer is encrypted at the transport level. The encryption scheme is determined per-protocol and is not user-configurable to prevent misconfiguration.</div>
+          </div>
+        </li>
+        <li>
+          <div class="sec-icon">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="var(--c-text3)" stroke-width="1.2"><circle cx="9" cy="9" r="7"/><path d="M9 5v4l3 2"/></svg>
+          </div>
+          <div>
+            <div class="sec-label" data-key="sec2_h">Protocol Abstraction</div>
+            <div class="sec-desc" data-key="sec2_p">Traffic signatures are normalized at the egress point. This reduces the surface area for deep packet inspection to identify and block specific applications or services. Protocol selection is automatic and not exposed as a user preference.</div>
+          </div>
+        </li>
+        <li>
+          <div class="sec-icon">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="var(--c-text3)" stroke-width="1.2"><path d="M9 2L2 6v4c0 3.86 2.93 7.48 7 8.5 4.07-1.02 7-4.64 7-8.5V6L9 2z"/></svg>
+          </div>
+          <div>
+            <div class="sec-label" data-key="sec3_h">No Configuration Attack Surface</div>
+            <div class="sec-desc" data-key="sec3_p">Zero-configuration design eliminates the class of vulnerabilities introduced by user misconfiguration. There are no credentials to leak, no settings to misapply, and no user-managed certificates to expire or be improperly trusted.</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="reveal reveal-d2">
+      <!-- Security SVG diagram -->
+      <svg width="100%" height="360" viewBox="0 0 340 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Outer shield -->
+        <path d="M170 20L40 70v100c0 90 57.5 174 130 200 72.5-26 130-110 130-200V70L170 20z" stroke="var(--c-line2)" stroke-width="1" fill="var(--c-bg3)"/>
+        <!-- Inner shield -->
+        <path d="M170 60l-90 35v70c0 63 40.25 121.8 90 140 49.75-18.2 90-77 90-140V95L170 60z" stroke="var(--c-line)" stroke-width="1" fill="none"/>
+        <!-- Lock icon center -->
+        <rect x="148" y="165" width="44" height="36" rx="3" stroke="var(--c-text2)" stroke-width="1.5" fill="none"/>
+        <path d="M156 165v-10a14 14 0 0128 0v10" stroke="var(--c-text2)" stroke-width="1.5" fill="none"/>
+        <circle cx="170" cy="182" r="4" fill="var(--c-text2)"/>
+        <line x1="170" y1="186" x2="170" y2="193" stroke="var(--c-text2)" stroke-width="1.5"/>
+        <!-- Labels -->
+        <text x="170" y="260" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--c-text3)" letter-spacing="1">ENCRYPTED</text>
+        <text x="170" y="274" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--c-text3)" letter-spacing="1">TRANSPORT</text>
+        <!-- Nodes on shield path -->
+        <circle cx="80" cy="130" r="4" fill="none" stroke="var(--c-text3)" stroke-width="1"/>
+        <circle cx="260" cy="130" r="4" fill="none" stroke="var(--c-text3)" stroke-width="1"/>
+        <circle cx="170" cy="280" r="4" fill="none" stroke="var(--c-text3)" stroke-width="1"/>
+        <text x="48" y="134" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="var(--c-text3)">TLS</text>
+        <text x="288" y="134" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="var(--c-text3)">OBFS</text>
+        <text x="170" y="300" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="var(--c-text3)">ABSTRACTED</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<div class="section-full" id="roadmap">
+  <div class="inner">
+    <div class="section-label" data-key="rm_label">Development Timeline</div>
+    <h2 class="section-heading reveal" data-key="rm_h">Product <em>Roadmap</em></h2>
+
+    <div class="roadmap-list">
+      <div class="rm-item reveal">
+        <div class="rm-left"><div class="rm-dot"></div><div class="rm-num">P0</div></div>
+        <div class="rm-right">
+          <div class="rm-header">
+            <div class="rm-phase-label" data-key="rm0_h">Phase 0 — Validation</div>
+            <div class="rm-duration" data-key="rm0_d">1–2 weeks</div>
+          </div>
+          <div class="rm-goal" data-key="rm0_g">Raspberry Pi + Linux prototype. Manual protocol switching. Multi-network stability testing across mobile, public Wi-Fi, and filtered environments. If the core doesn't hold here, nothing else proceeds.</div>
+        </div>
+      </div>
+      <div class="rm-item reveal reveal-d1">
+        <div class="rm-left"><div class="rm-dot"></div><div class="rm-num">P1</div></div>
+        <div class="rm-right">
+          <div class="rm-header">
+            <div class="rm-phase-label" data-key="rm1_h">Phase 1 — MVP</div>
+            <div class="rm-duration" data-key="rm1_d">3–5 weeks</div>
+          </div>
+          <div class="rm-goal" data-key="rm1_g">NODEX LINK v1: automatic protocol detection and switching. Basic fallback logic. Minimal web interface — status, reboot. UX target: turn on, connect, works. No configuration flow.</div>
+        </div>
+      </div>
+      <div class="rm-item reveal reveal-d2">
+        <div class="rm-left"><div class="rm-dot"></div><div class="rm-num">P2</div></div>
+        <div class="rm-right">
+          <div class="rm-header">
+            <div class="rm-phase-label" data-key="rm2_h">Phase 2 — Alpha</div>
+            <div class="rm-duration" data-key="rm2_d">2–4 weeks</div>
+          </div>
+          <div class="rm-goal" data-key="rm2_g">5–15 testers with real-world use cases. Structured failure collection: where it breaks, when, under which network conditions. This phase drives Phase 3 priorities entirely.</div>
+        </div>
+      </div>
+      <div class="rm-item reveal reveal-d3">
+        <div class="rm-left"><div class="rm-dot"></div><div class="rm-num">P3</div></div>
+        <div class="rm-right">
+          <div class="rm-header">
+            <div class="rm-phase-label" data-key="rm3_h">Phase 3 — Stabilization</div>
+            <div class="rm-duration" data-key="rm3_d">4–6 weeks</div>
+          </div>
+          <div class="rm-goal" data-key="rm3_g">Stability target: 80–90% reliable operation across tested conditions. Switch latency reduction. Logging infrastructure for diagnostics. Automatic update delivery. NODEX LINK logic refinement.</div>
+        </div>
+      </div>
+      <div class="rm-item reveal reveal-d4">
+        <div class="rm-left"><div class="rm-dot"></div><div class="rm-num">P4</div></div>
+        <div class="rm-right">
+          <div class="rm-header">
+            <div class="rm-phase-label" data-key="rm4_h">Phase 4 — Product Design</div>
+            <div class="rm-duration" data-key="rm4_d">3–4 weeks</div>
+          </div>
+          <div class="rm-goal" data-key="rm4_g">Final device form factor. Industrial enclosure design. Branding finalization. Public landing page. Early access list activation. Render production — no photography required at this stage.</div>
+        </div>
+      </div>
+      <div class="rm-item reveal reveal-d5">
+        <div class="rm-left"><div class="rm-dot"></div><div class="rm-num">P5</div></div>
+        <div class="rm-right">
+          <div class="rm-header">
+            <div class="rm-phase-label" data-key="rm5_h">Phase 5 — Beta Launch</div>
+            <div class="rm-duration" data-key="rm5_d">3–6 weeks</div>
+          </div>
+          <div class="rm-goal" data-key="rm5_g">50–100 units. Community channels (Telegram, Reddit). No required subscription at launch. Primary metric: does anyone pay, and do they return? Revenue validation before production commitment.</div>
+        </div>
+      </div>
+      <div class="rm-item reveal">
+        <div class="rm-left"><div class="rm-dot"></div><div class="rm-num">P6</div></div>
+        <div class="rm-right">
+          <div class="rm-header">
+            <div class="rm-phase-label" data-key="rm6_h">Phase 6 — Production</div>
+            <div class="rm-duration" data-key="rm6_d">6+ months</div>
+          </div>
+          <div class="rm-goal" data-key="rm6_g">Custom PCB design. Injection-molded enclosure tooling. Assembly pipeline. Quality testing protocol. Do not enter this phase without validated demand from Phase 5.</div>
+        </div>
+      </div>
+      <div class="rm-item reveal reveal-d1">
+        <div class="rm-left"><div class="rm-dot"></div><div class="rm-num">P7</div></div>
+        <div class="rm-right">
+          <div class="rm-header">
+            <div class="rm-phase-label" data-key="rm7_h">Phase 7 — Scaling</div>
+            <div class="rm-duration" data-key="rm7_d">Ongoing</div>
+          </div>
+          <div class="rm-goal" data-key="rm7_g">Subscription infrastructure. NODEX LINK v2 development. Distribution expansion. This phase is conditional on all prior phases completing with validated metrics.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<section id="faq" class="section">
+  <div class="section-label" data-key="faq_label">Common Questions</div>
+  <h2 class="section-heading reveal" data-key="faq_h">FAQ</h2>
+
+  <div class="faq-list reveal reveal-d1" style="max-width: 860px;">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span data-key="faq1_q">Is NODEX a VPN?</span>
+        <span class="faq-q-icon"></span>
+      </button>
+      <div class="faq-a" data-key="faq1_a">No. VPN routes all traffic through a single fixed server endpoint using a static protocol. NODEX operates as a personal adaptive node — it dynamically selects protocols and routing paths based on real-time network conditions. There is no central server. Routing is distributed and continuously recalculated.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span data-key="faq2_q">How does NODEX differ from existing solutions?</span>
+        <span class="faq-q-icon"></span>
+      </button>
+      <div class="faq-a" data-key="faq2_a">Most connectivity tools require manual protocol selection, server configuration, or technical maintenance. NODEX handles the entire decision loop automatically — detection, protocol selection, and route adaptation happen without user input. The product category is closer to a smart network appliance than a software service.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span data-key="faq3_q">Does it require technical setup?</span>
+        <span class="faq-q-icon"></span>
+      </button>
+      <div class="faq-a" data-key="faq3_a">No. The device powers on in a ready state. Connect any device to the NODEX Wi-Fi network. Everything else is handled automatically by NODEX LINK. There are no configuration screens, no credentials to enter, and no decisions delegated to the user.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span data-key="faq4_q">How stable is the connection?</span>
+        <span class="faq-q-icon"></span>
+      </button>
+      <div class="faq-a" data-key="faq4_a">In tested conditions, uptime approaches 98% in adaptive mode. Switch latency between protocols is under 500ms. 50+ protocol switches per hour occur without session drops under standard load. Stability is network-dependent — performance in heavily congested or intentionally disrupted environments is a specific focus of the Alpha and Stabilization phases.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span data-key="faq5_q">Can the connection fail?</span>
+        <span class="faq-q-icon"></span>
+      </button>
+      <div class="faq-a" data-key="faq5_a">Yes. NODEX does not claim 100% uptime under all conditions. In environments where all available protocols are simultaneously blocked at the infrastructure level, the system cannot maintain a connection. The design goal is to handle the majority of real-world restricted and unstable environments reliably — not to claim immunity from all possible blocking scenarios.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span data-key="faq6_q">When will NODEX be available?</span>
+        <span class="faq-q-icon"></span>
+      </button>
+      <div class="faq-a" data-key="faq6_a">NODEX is currently in pre-production development. The roadmap targets a beta unit distribution at Phase 5, following validation, MVP development, alpha testing, and stabilization phases. Early access registration is open. Registered users receive priority access to beta units and updates on production timelines.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section" id="contact">
+  <div class="section-label" style="justify-content:center;" data-key="cta_label">Early Access</div>
+  <h2 class="reveal" data-key="cta_h">Get Early Access</h2>
+  <p class="reveal reveal-d1" data-key="cta_p">Register for priority access to beta units. Limited availability. No commitment required at this stage.</p>
+  <form class="signup-form reveal reveal-d2" onsubmit="handleSignup(event)">
+    <input type="email" placeholder="your@email.com" required>
+    <button type="submit" data-key="cta_btn">Register</button>
+  </form>
+  <p class="reveal reveal-d3" style="margin-top: 24px; font-size: 12px; color: var(--c-text3); font-family: var(--font-mono);" data-key="cta_note">No spam. No commitments. Production timeline updates only.</p>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h3>NODEX<sup>®</sup></h3>
+        <p data-key="footer_desc">Personal adaptive network node. Stable connectivity in unstable environments.</p>
+      </div>
+      <div class="footer-col">
+        <h4 data-key="footer_product">Product</h4>
+        <ul>
+          <li><a href="#features" data-key="nav_features">Features</a></li>
+          <li><a href="#technology" data-key="nav_technology">Technology</a></li>
+          <li><a href="#performance" data-key="nav_performance">Performance</a></li>
+          <li><a href="#infrastructure" data-key="nav_infrastructure">Infrastructure</a></li>
+          <li><a href="#security" data-key="nav_security">Security</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 data-key="footer_company">Company</h4>
+        <ul>
+          <li><a href="#roadmap" data-key="nav_roadmap">Roadmap</a></li>
+          <li><a href="#faq" data-key="nav_faq">FAQ</a></li>
+          <li><a href="#contact" data-key="nav_contact">Contact</a></li>
+          <li><a href="mailto:hello@nodex.io">hello@nodex.io</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 data-key="footer_legal_h">Legal</h4>
+        <ul>
+          <li><a href="#" data-key="footer_privacy">Privacy Policy</a></li>
+          <li><a href="#" data-key="footer_terms">Terms of Use</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy" data-key="footer_copy">NODEX © 2024. All rights reserved.</div>
+      <div class="footer-legal">
+        <a href="#" data-key="footer_privacy">Privacy Policy</a>
+        <a href="#" data-key="footer_terms">Terms of Use</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<button id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 12V2M2 7l5-5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+
+<script>
+// ─── TRANSLATIONS ───────────────────────────────────────────────
+const T = {
+  en: {
+    nav_features:"Features",nav_technology:"Technology",nav_performance:"Performance",
+    nav_roadmap:"Roadmap",nav_infrastructure:"Infrastructure",nav_security:"Security",
+    nav_faq:"FAQ",nav_contact:"Contact",
+    hero_status:"NODEX LINK Active",
+    hero_tagline:"Adaptive Network. Always Connected.",
+    hero_sub:"A personal network node that ensures stable connectivity in restricted, unstable, or filtered environments — without configuration.",
+    hero_cta:"Get Early Access",hero_learn:"How It Works",hero_scroll:"Scroll",
+    trust1_h:"Unstable Environment Ready",trust1_p:"Designed specifically for restricted, throttled, and filtered network conditions.",
+    trust2_h:"Real-World Tested",trust2_p:"Validated across mobile networks, public Wi-Fi, and heavily filtered infrastructure.",
+    trust3_h:"Modern Routing Core",trust3_p:"Built on current-generation protocol stack with adaptive fallback logic at every layer.",
+    perf_label:"System Metrics",perf_h:"Performance Specifications",
+    stat1_d:"Server response time",stat1_m:"avg. measured",
+    stat2_d:"Connection establishment",stat2_m:"from power-on",
+    stat3_d:"Uptime in adaptive mode",stat3_m:"*network dependent",
+    stat4_d:"Peak node throughput",stat4_m:"theoretical max",
+    stat5_d:"Protocol switch latency",stat5_m:"measured transition",
+    stat6_d:"Concurrent devices",stat6_m:"per node",
+    stat7_d:"Protocol switches / hour",stat7_m:"without drop",
+    stat8_d:"Active protocols",stat8_m:"simultaneous routing",
+    stat9_d:"Dual-band Wi-Fi",stat9_m:"802.11ac/n",
+    stat10_d:"Coverage radius",stat10_m:"open environment",
+    stat11_d:"Battery autonomy",stat11_m:"active load",
+    stat_disclaimer:"* All metrics depend on network conditions, location, and configuration state. Values represent measured or theoretical bounds.",
+    tech_label:"Core Technology",tech_h:"NODEX LINK",
+    tech_intro:"NODEX LINK is the adaptive routing engine embedded in every device. It continuously monitors network conditions, identifies restrictions, and reroutes traffic without user interaction.",
+    flow1_h:"Detect",flow1_p:"Samples network conditions every 200ms. Identifies latency spikes, packet loss, DNS interference, deep packet inspection, and protocol filtering.",
+    flow2_h:"Analyze",flow2_p:"Scores available protocols and routing paths. Ranks options by stability, throughput, and evasion effectiveness. Selects the optimal fallback chain.",
+    flow3_h:"Adapt",flow3_p:"Switches active protocol within 500ms. Re-wraps traffic in the required transport layer. Updates routing tables without breaking active sessions.",
+    flow4_h:"Route",flow4_p:"Maintains stable connection state across the private Wi-Fi network. All connected devices benefit simultaneously. No user interaction at any step.",
+    feat_label:"Capabilities",feat_h:"Core Features",
+    f1_tag:"01 / Feature",f1_h:"Adaptive Routing",f1_p:"Real-time analysis of network conditions drives automatic protocol selection. NODEX LINK scores and ranks available paths every 200ms, switching seamlessly before degradation affects user experience.",
+    f2_tag:"02 / Feature",f2_h:"Multi-Protocol Engine",f2_p:"Four concurrent routing protocols maintained in parallel. Fallback chains are pre-computed before the primary route fails. 50+ switches per hour without session interruption is standard operating mode.",
+    f3_tag:"03 / Feature",f3_h:"Zero Configuration",f3_p:"No setup screens. No credentials. No technical knowledge required. Turn on, connect to the NODEX Wi-Fi network, and the system handles the rest.",
+    f4_tag:"04 / Feature",f4_h:"Portable Node",f4_p:"Pocket-sized industrial unit. Dual external antennas. Dual-band 802.11ac/n. 6–12h battery. 20m stable coverage radius. Up to 12 concurrent connected devices.",
+    dev_label:"Hardware",dev_h:"The Device",dev_badge:"Hardware — Node N-1",
+    dev_h2:"Engineered for Field Conditions",
+    dev_p:"The NODEX hardware unit is designed around the use case: deployed quickly, operated without interaction, maintained without technical staff. Industrial-grade components, ruggedized enclosure, extended thermal range.",
+    spec1_k:"Form factor",spec2_k:"Antennas",spec3_k:"Wi-Fi",spec4_k:"Frequency bands",
+    spec5_k:"Coverage",spec6_k:"Devices",spec7_k:"Battery",spec8_k:"Connectivity",
+    spec9_k:"Price",spec10_k:"Subscription",
+    infra_label:"System Architecture",infra_h:"Infrastructure Design",
+    infra_intro:"NODEX operates as a layered adaptive system where each component functions independently and can maintain connection state during failure of adjacent layers.",
+    infra1_tag:"Layer 01",infra1_h:"Distributed Routing",
+    infra1_p:"Traffic does not pass through a central server. NODEX routes through dynamically selected endpoints based on current network topology. There is no single point of failure.",
+    infra2_tag:"Layer 02",infra2_h:"Dynamic Endpoints",
+    infra2_p:"Available relay infrastructure is evaluated in real time. NODEX LINK maintains a scored pool of endpoints, aging out degraded entries and promoting newly discovered ones.",
+    infra3_tag:"Layer 03",infra3_h:"Protocol Switching",
+    infra3_p:"Protocol selection operates independently from routing. A given route may be re-wrapped in a different transport protocol without changing the underlying path.",
+    sec_label:"Privacy & Protection",sec_h:"Security Model",
+    sec_intro:"NODEX does not claim to be an anonymity tool. It claims to be a resilient transport layer. Security properties follow from that architecture, not from marketing intent.",
+    sec1_h:"Encrypted Transport",sec1_p:"All traffic passing through the NODEX routing layer is encrypted at the transport level. The encryption scheme is determined per-protocol and is not user-configurable to prevent misconfiguration.",
+    sec2_h:"Protocol Abstraction",sec2_p:"Traffic signatures are normalized at the egress point. This reduces the surface area for deep packet inspection to identify and block specific applications or services.",
+    sec3_h:"No Configuration Attack Surface",sec3_p:"Zero-configuration design eliminates the class of vulnerabilities introduced by user misconfiguration. There are no credentials to leak, no settings to misapply.",
+    rm_label:"Development Timeline",rm_h:"Product Roadmap",
+    rm0_h:"Phase 0 — Validation",rm0_d:"1–2 weeks",rm0_g:"Raspberry Pi + Linux prototype. Manual protocol switching. Multi-network stability testing. If the core doesn't hold here, nothing else proceeds.",
+    rm1_h:"Phase 1 — MVP",rm1_d:"3–5 weeks",rm1_g:"NODEX LINK v1: automatic protocol detection and switching. Basic fallback logic. Minimal web interface. UX target: turn on, connect, works.",
+    rm2_h:"Phase 2 — Alpha",rm2_d:"2–4 weeks",rm2_g:"5–15 testers with real-world use cases. Structured failure collection. This phase drives Phase 3 priorities entirely.",
+    rm3_h:"Phase 3 — Stabilization",rm3_d:"4–6 weeks",rm3_g:"Stability target: 80–90% reliable operation. Switch latency reduction. Logging infrastructure. Automatic update delivery.",
+    rm4_h:"Phase 4 — Product Design",rm4_d:"3–4 weeks",rm4_g:"Final device form factor. Industrial enclosure. Branding finalization. Public landing page. Early access activation.",
+    rm5_h:"Phase 5 — Beta Launch",rm5_d:"3–6 weeks",rm5_g:"50–100 units. Community channels. Primary metric: does anyone pay, and do they return? Revenue validation before production commitment.",
+    rm6_h:"Phase 6 — Production",rm6_d:"6+ months",rm6_g:"Custom PCB. Injection-molded enclosure tooling. Assembly pipeline. Do not enter without validated demand from Phase 5.",
+    rm7_h:"Phase 7 — Scaling",rm7_d:"Ongoing",rm7_g:"Subscription infrastructure. NODEX LINK v2 development. Distribution expansion. Conditional on all prior phases completing with validated metrics.",
+    faq_label:"Common Questions",faq_h:"FAQ",
+    faq1_q:"Is NODEX a VPN?",faq1_a:"No. VPN routes traffic through a fixed server using a static protocol. NODEX dynamically selects protocols and routing paths based on real-time network conditions. There is no central server. Routing is distributed and continuously recalculated.",
+    faq2_q:"How does NODEX differ from existing solutions?",faq2_a:"Most connectivity tools require manual protocol selection or technical maintenance. NODEX handles the entire decision loop automatically — detection, protocol selection, and route adaptation without user input.",
+    faq3_q:"Does it require technical setup?",faq3_a:"No. The device powers on in a ready state. Connect any device to the NODEX Wi-Fi network. Everything else is handled automatically by NODEX LINK. No configuration screens, no credentials.",
+    faq4_q:"How stable is the connection?",faq4_a:"In tested conditions, uptime approaches 98% in adaptive mode. Switch latency under 500ms. 50+ switches per hour without session drops under standard load. Performance is network-dependent.",
+    faq5_q:"Can the connection fail?",faq5_a:"Yes. In environments where all protocols are simultaneously blocked at the infrastructure level, the system cannot maintain a connection. The design goal is to handle the majority of real-world restricted environments reliably.",
+    faq6_q:"When will NODEX be available?",faq6_a:"NODEX is currently in pre-production development. Early access registration is open. Registered users receive priority access to beta units and updates on production timelines.",
+    cta_label:"Early Access",cta_h:"Get Early Access",
+    cta_p:"Register for priority access to beta units. Limited availability. No commitment required at this stage.",
+    cta_btn:"Register",cta_note:"No spam. No commitments. Production timeline updates only.",
+    footer_desc:"Personal adaptive network node. Stable connectivity in unstable environments.",
+    footer_product:"Product",footer_company:"Company",footer_legal_h:"Legal",
+    footer_privacy:"Privacy Policy",footer_terms:"Terms of Use",
+    footer_copy:"NODEX © 2024. All rights reserved.",
+    theme_light:"Light",theme_dark:"Dark"
+  },
+  ru: {
+    nav_features:"Функции",nav_technology:"Технология",nav_performance:"Показатели",
+    nav_roadmap:"Дорожная карта",nav_infrastructure:"Инфраструктура",nav_security:"Безопасность",
+    nav_faq:"FAQ",nav_contact:"Контакт",
+    hero_status:"NODEX LINK Активен",
+    hero_tagline:"Адаптивная сеть. Всегда подключена.",
+    hero_sub:"Персональный сетевой узел, обеспечивающий стабильное подключение в ограниченных, нестабильных и фильтруемых средах — без настройки.",
+    hero_cta:"Ранний доступ",hero_learn:"Как это работает",hero_scroll:"Вниз",
+    trust1_h:"Готов к нестабильной среде",trust1_p:"Разработан специально для ограниченных, заблокированных и фильтруемых сетевых условий.",
+    trust2_h:"Проверено в реальных условиях",trust2_p:"Протестировано в мобильных сетях, публичном Wi-Fi и сильно фильтруемой инфраструктуре.",
+    trust3_h:"Современное ядро маршрутизации",trust3_p:"На базе современного стека протоколов с адаптивной логикой переключения на каждом уровне.",
+    perf_label:"Системные показатели",perf_h:"Технические характеристики",
+    stat1_d:"Время ответа сервера",stat1_m:"среднее измеренное",
+    stat2_d:"Установление соединения",stat2_m:"с момента включения",
+    stat3_d:"Аптайм в адаптивном режиме",stat3_m:"*зависит от сети",
+    stat4_d:"Пропускная способность узла",stat4_m:"теоретический максимум",
+    stat5_d:"Задержка переключения протокола",stat5_m:"измеренный переход",
+    stat6_d:"Одновременных устройств",stat6_m:"на один узел",
+    stat7_d:"Переключений протоколов / час",stat7_m:"без разрыва",
+    stat8_d:"Активных протоколов",stat8_m:"одновременная маршрутизация",
+    stat9_d:"Двухдиапазонный Wi-Fi",stat9_m:"802.11ac/n",
+    stat10_d:"Радиус покрытия",stat10_m:"открытая среда",
+    stat11_d:"Автономность батареи",stat11_m:"под нагрузкой",
+    stat_disclaimer:"* Все показатели зависят от условий сети, местоположения и состояния конфигурации. Значения — измеренные или теоретические границы.",
+    tech_label:"Ключевая технология",tech_h:"NODEX LINK",
+    tech_intro:"NODEX LINK — адаптивный движок маршрутизации, встроенный в каждое устройство. Он непрерывно отслеживает условия сети, выявляет ограничения и перенаправляет трафик без участия пользователя.",
+    flow1_h:"Обнаружение",flow1_p:"Замеряет условия сети каждые 200 мс. Определяет задержки, потери пакетов, вмешательство DNS, глубокую инспекцию пакетов и фильтрацию протоколов.",
+    flow2_h:"Анализ",flow2_p:"Оценивает доступные протоколы и пути маршрутизации. Ранжирует варианты по стабильности, пропускной способности и устойчивости к блокировке.",
+    flow3_h:"Адаптация",flow3_p:"Переключает активный протокол за 500 мс. Перепаковывает трафик в требуемый транспортный уровень без разрыва активных сессий.",
+    flow4_h:"Маршрутизация",flow4_p:"Поддерживает стабильное соединение через приватную Wi-Fi сеть. Все подключённые устройства получают результат одновременно. Участие пользователя не требуется.",
+    feat_label:"Возможности",feat_h:"Ключевые функции",
+    f1_tag:"01 / Функция",f1_h:"Адаптивная маршрутизация",f1_p:"Анализ сети в реальном времени управляет автоматическим выбором протокола. NODEX LINK оценивает и ранжирует доступные пути каждые 200 мс, переключаясь раньше, чем деградация затронет пользователя.",
+    f2_tag:"02 / Функция",f2_h:"Мультипротокольный движок",f2_p:"Четыре протокола маршрутизации поддерживаются параллельно. Цепочки переключений рассчитываются заранее. 50+ переключений в час без разрыва сессий — стандартный режим.",
+    f3_tag:"03 / Функция",f3_h:"Нулевая конфигурация",f3_p:"Никаких настроек. Никаких учётных данных. Включи, подключись к Wi-Fi NODEX — система сделает всё остальное самостоятельно.",
+    f4_tag:"04 / Функция",f4_h:"Портативный узел",f4_p:"Карманный индустриальный корпус. Две внешние антенны. Двухдиапазонный 802.11ac/n. Батарея 6–12 ч. До 20 м покрытия. До 12 устройств одновременно.",
+    dev_label:"Аппаратная часть",dev_h:"Устройство",dev_badge:"Аппаратура — Узел N-1",
+    dev_h2:"Создано для полевых условий",
+    dev_p:"Аппаратный блок NODEX проектировался исходя из реального применения: быстрое развёртывание, работа без взаимодействия, обслуживание без технических специалистов.",
+    spec1_k:"Форм-фактор",spec2_k:"Антенны",spec3_k:"Wi-Fi",spec4_k:"Частотные диапазоны",
+    spec5_k:"Покрытие",spec6_k:"Устройства",spec7_k:"Батарея",spec8_k:"Подключение",
+    spec9_k:"Цена",spec10_k:"Подписка",
+    infra_label:"Системная архитектура",infra_h:"Инфраструктура",
+    infra_intro:"NODEX работает как многоуровневая адаптивная система, где каждый компонент функционирует независимо и сохраняет состояние соединения при отказе соседних слоёв.",
+    infra1_tag:"Уровень 01",infra1_h:"Распределённая маршрутизация",
+    infra1_p:"Трафик не проходит через центральный сервер. NODEX маршрутизирует через динамически выбранные конечные точки. Единой точки отказа нет.",
+    infra2_tag:"Уровень 02",infra2_h:"Динамические конечные точки",
+    infra2_p:"Доступная ретрансляционная инфраструктура оценивается в реальном времени. NODEX LINK ведёт пул оцененных точек и непрерывно обновляет его.",
+    infra3_tag:"Уровень 03",infra3_h:"Переключение протоколов",
+    infra3_p:"Выбор протокола работает независимо от маршрутизации. Маршрут может быть перепакован в другой транспортный протокол без изменения пути.",
+    sec_label:"Приватность и защита",sec_h:"Модель безопасности",
+    sec_intro:"NODEX не позиционируется как инструмент анонимизации. Это надёжный транспортный уровень. Свойства безопасности — следствие архитектуры, а не маркетинга.",
+    sec1_h:"Шифрование трафика",sec1_p:"Весь трафик через маршрутизирующий уровень NODEX шифруется на транспортном уровне. Схема шифрования определяется на протокол и недоступна для изменения пользователем.",
+    sec2_h:"Абстракция протоколов",sec2_p:"Сигнатуры трафика нормализуются на точке выхода. Это снижает поверхность для глубокой инспекции пакетов при попытке идентифицировать и заблокировать приложения.",
+    sec3_h:"Нет поверхности для конфигурационных атак",sec3_p:"Нулевая конфигурация исключает класс уязвимостей, связанных с ошибками настройки. Нет учётных данных, нет настроек, нет сертификатов.",
+    rm_label:"Хронология разработки",rm_h:"Дорожная карта",
+    rm0_h:"Фаза 0 — Валидация",rm0_d:"1–2 недели",rm0_g:"Прототип на Raspberry Pi + Linux. Ручное переключение протоколов. Тестирование стабильности в разных сетях. Если ядро не держится — всё остальное откладывается.",
+    rm1_h:"Фаза 1 — MVP",rm1_d:"3–5 недель",rm1_g:"NODEX LINK v1: автоматическое обнаружение и переключение протоколов. Базовая логика переключения. Минимальный интерфейс. UX-цель: включил, подключился, работает.",
+    rm2_h:"Фаза 2 — Альфа",rm2_d:"2–4 недели",rm2_g:"5–15 тестировщиков в реальных условиях. Сбор данных об отказах. Эта фаза полностью определяет приоритеты Фазы 3.",
+    rm3_h:"Фаза 3 — Стабилизация",rm3_d:"4–6 недель",rm3_g:"Цель по стабильности: 80–90% надёжной работы. Снижение задержки переключения. Логирование. Автоматические обновления.",
+    rm4_h:"Фаза 4 — Дизайн продукта",rm4_d:"3–4 недели",rm4_g:"Финальный форм-фактор. Индустриальный корпус. Финализация бренда. Публичный лендинг. Активация раннего доступа.",
+    rm5_h:"Фаза 5 — Бета-запуск",rm5_d:"3–6 недель",rm5_g:"50–100 устройств. Каналы сообщества. Ключевые метрики: платят ли люди и возвращаются ли? Валидация дохода перед производством.",
+    rm6_h:"Фаза 6 — Производство",rm6_d:"6+ месяцев",rm6_g:"Кастомная PCB. Литьё корпуса. Сборочный конвейер. Входить только при подтверждённом спросе из Фазы 5.",
+    rm7_h:"Фаза 7 — Масштабирование",rm7_d:"Постоянно",rm7_g:"Инфраструктура подписки. Разработка NODEX LINK v2. Расширение дистрибуции. Условие — все предыдущие фазы с подтверждёнными метриками.",
+    faq_label:"Частые вопросы",faq_h:"FAQ",
+    faq1_q:"NODEX — это VPN?",faq1_a:"Нет. VPN направляет трафик через фиксированный сервер со статическим протоколом. NODEX динамически выбирает протоколы и пути маршрутизации на основе условий сети в реальном времени. Центрального сервера нет.",
+    faq2_q:"Чем NODEX отличается от существующих решений?",faq2_a:"Большинство инструментов требуют ручного выбора протокола или технического обслуживания. NODEX автоматически обрабатывает всю цепочку решений — обнаружение, выбор протокола, адаптация маршрута.",
+    faq3_q:"Требует ли настройки?",faq3_a:"Нет. Устройство включается в готовом состоянии. Подключитесь к Wi-Fi NODEX — всё остальное делает NODEX LINK автоматически. Никаких экранов настройки, учётных данных.",
+    faq4_q:"Насколько стабильно соединение?",faq4_a:"В протестированных условиях аптайм приближается к 98% в адаптивном режиме. Задержка переключения — менее 500 мс. 50+ переключений в час без разрыва сессий под стандартной нагрузкой.",
+    faq5_q:"Может ли соединение оборваться?",faq5_a:"Да. В средах, где все протоколы одновременно заблокированы на уровне инфраструктуры, система не может поддерживать соединение. Цель — надёжно работать в большинстве реальных ограниченных условий.",
+    faq6_q:"Когда NODEX будет доступен?",faq6_a:"NODEX находится в стадии пред-производственной разработки. Регистрация на ранний доступ открыта. Зарегистрированные пользователи получают приоритет при распределении бета-устройств.",
+    cta_label:"Ранний доступ",cta_h:"Получить ранний доступ",
+    cta_p:"Зарегистрируйтесь для приоритетного доступа к бета-устройствам. Ограниченное количество мест. Никаких обязательств.",
+    cta_btn:"Зарегистрироваться",cta_note:"Без спама. Только обновления по срокам производства.",
+    footer_desc:"Персональный адаптивный сетевой узел. Стабильное подключение в нестабильной среде.",
+    footer_product:"Продукт",footer_company:"Компания",footer_legal_h:"Правовые",
+    footer_privacy:"Политика конфиденциальности",footer_terms:"Условия использования",
+    footer_copy:"NODEX © 2024. Все права защищены.",
+    theme_light:"Светлая",theme_dark:"Тёмная"
+  }
+};
+
+let currentLang = localStorage.getItem('ndx_lang') || 'en';
+let currentTheme = localStorage.getItem('ndx_theme') || 'dark';
+
+function applyLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('ndx_lang', lang);
+  document.documentElement.lang = lang;
+  document.getElementById('lang-toggle').textContent = lang.toUpperCase();
+  document.querySelectorAll('[data-key]').forEach(el => {
+    const key = el.dataset.key;
+    if (T[lang][key] !== undefined) el.textContent = T[lang][key];
+  });
+  const tl = document.getElementById('theme-label');
+  if (tl) tl.textContent = currentTheme === 'dark' ? T[lang].theme_light : T[lang].theme_dark;
+}
+
+function applyTheme(theme) {
+  currentTheme = theme;
+  localStorage.setItem('ndx_theme', theme);
+  document.documentElement.setAttribute('data-theme', theme);
+  const tl = document.getElementById('theme-label');
+  if (tl) tl.textContent = theme === 'dark' ? T[currentLang].theme_light : T[currentLang].theme_dark;
+}
+
+document.getElementById('lang-toggle').addEventListener('click', () => {
+  applyLang(currentLang === 'en' ? 'ru' : 'en');
+});
+document.getElementById('theme-toggle').addEventListener('click', () => {
+  applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+});
+
+applyTheme(currentTheme);
+applyLang(currentLang);
+
+// ─── SCROLL PROGRESS ────────────────────────────────────────────
+const progress = document.getElementById('progress');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (window.scrollY / (h.scrollHeight - h.clientHeight)) * 100;
+  progress.style.width = pct + '%';
+
+  // header
+  document.getElementById('header').classList.toggle('scrolled', window.scrollY > 10);
+  // btt
+  document.getElementById('btt').classList.toggle('visible', window.scrollY > 400);
+}, { passive: true });
+
+// ─── REVEAL ON SCROLL ────────────────────────────────────────────
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); revealObs.unobserve(e.target); } });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+// ─── ANIMATED COUNTERS ───────────────────────────────────────────
+const counterObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    const target = parseInt(el.dataset.target);
+    const suffix = el.dataset.suffix || '';
+    const prefix = el.dataset.prefix || '';
+    if (isNaN(target)) return;
+    counterObs.unobserve(el);
+    let start = 0;
+    const dur = 1400;
+    const startTime = performance.now();
+    function step(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / dur, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const val = Math.round(ease * target);
+      el.textContent = prefix + val + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = prefix + target + suffix;
+    }
+    requestAnimationFrame(step);
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.stat-num[data-target]').forEach(el => counterObs.observe(el));
+
+// ─── FAQ ─────────────────────────────────────────────────────────
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+// ─── SIGNUP ──────────────────────────────────────────────────────
+function handleSignup(e) {
+  e.preventDefault();
+  const email = e.target.querySelector('input').value;
+  const msg = currentLang === 'en'
+    ? `Registered: ${email}. We will be in touch.`
+    : `Зарегистрировано: ${email}. Мы свяжемся с вами.`;
+  alert(msg);
+  e.target.reset();
+}
+</script>
+</body>
+</html>
